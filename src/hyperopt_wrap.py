@@ -9,8 +9,9 @@ from sklearn.model_selection import train_test_split
 import optuna
 
 class ModelHyperOpt:
-    def __init__(self, dataset, config): #TODO:need pass train and eval - in case of preprocessed (encoded, scaled) datasets
-        self.dataset = dataset
+    def __init__(self, train_set, eval_set, config): #TODO:need pass train and eval - in case of preprocessed (encoded, scaled) datasets
+        self.train_set = train_set
+        self.eval_set = eval_set
         self.config = config 
         
     def create_model(self, trial):
@@ -26,17 +27,11 @@ class ModelHyperOpt:
     
     def objective(self, trial):
         model = self.create_model(trial)
-        train_dataset, val_dataset, train_y, val_y = train_test_split(
-            self.dataset[0],
-            self.dataset[1],
-            random_state=random.randint(1, 10000),
-            test_size=0.2
-        )
         
-        X, y = train_dataset, train_y  
+        X, y = self.train_set[0], self.train_set[1]  
         X_train, _, y_train, _ = train_test_split(X, y, random_state=random.randint(1, 10000), test_size=0.2)
         
-        X, y = val_dataset, val_y
+        X, y = self.eval_set[0], self.eval_set[1]
         _, X_test, _, y_test = train_test_split(X, y, random_state=random.randint(1, 10000), test_size=0.8)
         
         fit_keywords_dict = {}
